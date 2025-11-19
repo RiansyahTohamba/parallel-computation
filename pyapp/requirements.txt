@@ -1,0 +1,3 @@
+# pip install dpctl dpnp numpy
+numba-dpex 
+dpctl
