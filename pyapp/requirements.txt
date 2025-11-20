@@ -1,3 +1,3 @@
-# pip install dpctl dpnp numpy
-numba-dpex 
+# claude= pip install dpctl dpnp numpy
+# gpt= pip install numba-dpex dpctl. ini salah wkwk
 dpctl

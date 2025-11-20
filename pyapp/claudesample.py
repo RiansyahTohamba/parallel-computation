@@ -56,39 +56,47 @@ def section_1_cpu_parallel():
 # ============================================================================
 
 def section_2_gpu_architecture():
-    """
-    Intel Iris Xe GPU Architecture:
-    - Hundreds/thousands of smaller execution units
-    - SIMD (Single Instruction Multiple Data) parallelism
-    - Best for: data-parallel operations, matrix operations
-    
-    Key concept: Work is divided into "work items" and "work groups"
-    """
-    print("\n" + "=" * 70)
-    print("SECTION 2: Understanding GPU Architecture")
     print("=" * 70)
-    
+    print("SECTION 2: GPU CHECK (SAFE MODE)")
+    print("=" * 70)
     try:
         import dpctl
-        
-        # Check available devices
-        print("\n📱 Available Intel Devices:")
-        for i, device in enumerate(dpctl.get_devices()):
-            print(f"  [{i}] {device.name}")
-            print(f"      Type: {device.device_type}")
-            print(f"      Max Work Group Size: {device.max_work_group_size}")
-            print(f"      Max Compute Units: {device.max_compute_units}")
-        
-        # Select GPU device
-        gpu_device = dpctl.select_default_device()
-        print(f"\n✓ Selected device: {gpu_device.name}")
-        
-        return gpu_device
-        
+
+        print("\n🚀 Enumerating SYCL devices...")
+
+        try:
+            devices = dpctl.get_devices()
+        except Exception as e:
+            print("❌ Tidak bisa mengambil daftar device.")
+            print("   Penyebab:", e)
+            raise SystemExit()
+
+        if not devices:
+            print("⚠ Tidak ada device SYCL yang terdeteksi.")
+            print("   Kemungkinan penyebab:")
+            print("   - Intel GPU driver belum ter-install (Level Zero / Compute Runtime).")
+            print("   - oneAPI Base Toolkit belum ter-install.")
+            raise SystemExit()
+
+        for i, dev in enumerate(devices):
+            print(f"\n[{i}] {dev.name}")
+            print(f"    Backend     : {dev.backend}")
+            print(f"    Type        : {dev.device_type}")
+            print(f"    Compute Unit: {dev.max_compute_units}")
+
+        # Coba ambil device GPU secara spesifik (jika ada)
+        gpu_candidates = [d for d in devices if d.device_type == "gpu"]
+        if gpu_candidates:
+            print("\n✓ GPU ditemukan!")
+            gpu = gpu_candidates[0]
+            print("  GPU:", gpu.name)
+        else:
+            print("\n⚠ Tidak ada GPU yang terdeteksi oleh SYCL.")
+            print("   (Iris Xe tidak muncul sebagai device SYCL)")
+
     except ImportError:
-        print("⚠ dpctl not installed. Install with: pip install dpctl")
-        print("   For full GPU support, install Intel oneAPI Base Toolkit")
-        return None
+        print("❌ dpctl belum ter-install.")
+        print("   Install dengan: pip install dpctl")
 
 # ============================================================================
 # SECTION 3: Simple GPU Operations - Vector Addition
@@ -392,17 +400,17 @@ def run_tutorial():
         section_6_best_practices()
         return
     
-    # Section 3: First GPU program
-    section_3_simple_gpu_operation(device)
+    # # Section 3: First GPU program
+    # section_3_simple_gpu_operation(device)
     
-    # Section 4: NLP vectorization
-    section_4_nlp_vectorization(device)
+    # # Section 4: NLP vectorization
+    # section_4_nlp_vectorization(device)
     
-    # Section 5: Semantic similarity
-    section_5_semantic_similarity(device)
+    # # Section 5: Semantic similarity
+    # section_5_semantic_similarity(device)
     
-    # Section 6: Best practices
-    section_6_best_practices()
+    # # Section 6: Best practices
+    # section_6_best_practices()
     
     print("\n" + "=" * 70)
     print(" 🎓 Tutorial Complete!")
